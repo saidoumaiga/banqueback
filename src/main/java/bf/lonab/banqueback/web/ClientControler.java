@@ -5,8 +5,11 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,6 +46,28 @@ public class ClientControler {
 		return mapper.writeValueAsString(reponseclt);
 	}
 	
+	@PutMapping("/client")
+	public String modifier(@RequestBody Client clt) throws JsonProcessingException {
+		Reponse<Client> repClt;
+		Client c = iCltM.trouver(clt.getId());
+		if (c!=null) {
+			try {
+				 Client client = iCltM.modifier(clt);
+				 List<String> msg = new ArrayList<>();
+				 msg.add(String.format("%s a été modifié avec succès", clt.getNom()));
+				 repClt = new Reponse<Client>(0,msg,client);
+			} catch (Exception e) {
+				// TODO: handle exception
+				repClt = new Reponse<Client>(1,GestionExceptions.getErrorForException(e), null);
+			}			
+		}else {
+			List<String> msg = new ArrayList<>();
+			msg.add(String.format("Client inexistant"));
+			repClt = new Reponse<Client>(3,msg,null);
+		}
+		return mapper.writeValueAsString(repClt);
+	}
+	
 	@GetMapping("/client")
 	public String lister() throws JsonProcessingException {
 		Reponse<List<Client>> rListClt = null;
@@ -62,6 +87,36 @@ public class ClientControler {
 			
 		}
 		return mapper.writeValueAsString(rListClt);
+	}
+	
+	@GetMapping("/client/{id}")
+	public String trouver(@PathVariable Long id) throws JsonProcessingException {
+		Reponse<Client> reponse = null;
+		try {
+			Client clt = iCltM.trouver(id);
+			reponse = new Reponse<Client>(0,null, clt);
+		} catch (Exception e) {
+			// TODO: handle exception
+			reponse = new Reponse<Client>(1,GestionExceptions.getErrorForException(e),null);
+		}
+		return mapper.writeValueAsString(reponse);
+	}
+	
+	
+	
+	@DeleteMapping("/client/{id}")
+	public String supprimer(@PathVariable Long id) throws JsonProcessingException {
+		Reponse<Boolean> reponse = null;
+		try {
+			 List<String> msg = new ArrayList<>();
+			 msg.add(String.format("%s a été supprimé avec succès", id));
+			 reponse = new Reponse<Boolean>(0, msg, iCltM.supprimer(id));
+	
+		} catch (Exception e) {
+			// TODO: handle exception
+			reponse = new Reponse<Boolean>(1,GestionExceptions.getErrorForException(e),null);
+		}
+		return mapper.writeValueAsString(reponse);
 	}
 	
 }

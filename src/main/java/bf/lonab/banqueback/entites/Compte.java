@@ -38,7 +38,6 @@ public class Compte extends AbstractEntity {
 	 */
 	
 	private static final long serialVersionUID = 1L;
-	private Date dateCreation;
 	private double solde;
 	@Column(name = "Type_Compte", insertable = true, updatable = true)
 	private String type;

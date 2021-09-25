@@ -8,56 +8,61 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bf.lonab.banqueback.entites.Compte;
+import bf.lonab.banqueback.entites.Versement;
 import bf.lonab.banqueback.metier.ICompteMetier;
+import bf.lonab.banqueback.metier.IVersementMetier;
 import bf.lonab.banqueback.utilitaire.GestionExceptions;
 import bf.lonab.banqueback.utilitaire.Reponse;
 
 @RestController
 @CrossOrigin
-public class CompteControler {
+@RequestMapping("/api/auth")
+
+public class VersementControler {
 	@Autowired
-	private ICompteMetier icm;
+	private IVersementMetier ivm;
 	@Autowired
 	private ObjectMapper mapper;
-	@PostMapping("/compte")
-	public String creer(@RequestBody Compte c) throws JsonProcessingException {
-		Reponse<Compte> reponse;
+	@PostMapping("/versement")
+	public String creer(@RequestBody Versement v) throws JsonProcessingException {
+		Reponse<Versement> reponse;
 		try {
-		  Compte cpte =	icm.creer(c);
+		  Versement verse =	ivm.creer(v);
 		  List<String> message = new ArrayList<>();
-		  message.add(String.format("%s a été crée avec succès.", cpte.getClient().getNom()));
-		  reponse = new Reponse<Compte>(0, message, cpte);
+		  message.add(String.format("%s a été crée avec succès.", verse.getId()));
+		  reponse = new Reponse<Versement>(0, message, verse);
 		} catch (Exception e) {
 			// TODO: handle exception
-		  reponse = new Reponse<Compte>(1, GestionExceptions.getErrorForException(e), null);
+		  reponse = new Reponse<Versement>(1, GestionExceptions.getErrorForException(e), null);
 		}
 	return mapper.writeValueAsString(reponse);	
 	}
-	
-	@GetMapping("/compte")
+
+	@GetMapping("/versement")
 	public String lister() throws JsonProcessingException {
-		Reponse<List<Compte>> reponse;
+		Reponse<List<Versement>> reponse;
 		try {
-			List<Compte> listCptes = icm.lister();
-			if (listCptes!=null && !listCptes.isEmpty()) {
-				reponse = new Reponse<List<Compte>>(0,null,listCptes);
+			List<Versement> listVerses = ivm.lister();
+			if (listVerses!=null && !listVerses.isEmpty()) {
+				reponse = new Reponse<List<Versement>>(0,null,listVerses);
 			} 
 			else
 			{
 				List<String> message = new ArrayList<>();
-				message.add("Pas de compte enrégistré !");
-				reponse = new Reponse<List<Compte>>(3,message,null);
+				message.add("Pas de versement enrégistré !");
+				reponse = new Reponse<List<Versement>>(3,message,null);
 			}
 			
 		} catch (Exception e) {
 			// TODO: handle exception
-			reponse = new Reponse<List<Compte>>(1,GestionExceptions.getErrorForException(e),null);
+			reponse = new Reponse<List<Versement>>(1,GestionExceptions.getErrorForException(e),null);
 		}
 		return mapper.writeValueAsString(reponse);
 	}
